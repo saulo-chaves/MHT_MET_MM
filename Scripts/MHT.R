@@ -3,10 +3,8 @@ rm(list=ls())
 # Required packages --------
 library(asreml)
 library(tidyverse)
-library(desplot)
 library(ComplexHeatmap)
 library(circlize)
-library(gifski)
 
 # Loading the data -------
 data = read.csv("Data/D1.csv", header = T, sep = ";")
@@ -35,28 +33,6 @@ data %>% group_by(yr, gen) %>% summarise(fy = mean(fy, na.rm=T)) %>%
   theme(legend.position = "none", legend.title = element_text(),
         axis.text.x = element_text(angle = 90))+
   ylab("Fruit yield")+xlab("Harvest years")
-
-## Spatial distribution --------
-
-plotlist = list()
-
-for(i in unique(data$yr)){
-  plotlist[[i]] = ggdesplot(fy ~ col * row, text = gen, cex = 1,
-                            data = data[data$yr == i,], flip = T, out1 = block,
-                            shorten = "no", show.key = T,ticks = T, 
-                            col.regions=colorRampPalette(brewer.pal(8, "YlOrBr"))(25),
-                            ylab = "Row", xlab = "Column", main = paste("Harvest year:",i)) +
-    labs(fill = "Fruit yield (kg)") +
-    theme(text = element_text(size = 15))
-  
-}
-
-gif_file = "Scripts/Outputs/MET/Spat_distr.gif"
-save_gif(
-  for(i in seq_along(plotlist)){
-    plot(plotlist[[i]])
-  }, gif_file,width = 1000, height = 720, delay = 3 
-)
 
 
 # Statistical analyses -----
@@ -490,8 +466,6 @@ modsel = data.frame(
   "ExpVar" = c('-','-','-','-','-','-','-','-','-',expvar1,expvar2,expvar3)
 )
 
-write.csv(modsel, file = "Scripts/Outputs/MHT/modsel_MHT.csv",row.names = F)
-
 ### Ranking comparison (Spearman correlation)
 
 rankings = cbind(blup.m0$predicted.value,blup.m1$predicted.value,blup.m2$predicted.value,
@@ -536,24 +510,6 @@ base = blup.m0[,1:2]
 colnames(base) = c('gen','blup.base')
 chosen = blup.m11.mean
 comparison = cbind(base, blup.chosen = chosen$blup)
-
-comparison %>% arrange(-blup.base) %>% mutate(rank.base = 1:ngen) %>% 
-  arrange(-blup.chosen) %>% mutate(rank.chosen = 1:ngen) %>% 
-  ggplot(aes(x = rank.base, y = rank.chosen))+
-  geom_point(aes(color = gen), size = 2)+
-  theme(axis.line = element_line(colour = 'black'),
-        panel.background = element_blank(), text = element_text(size = 14))+
-  labs(x = "Model 1 - Ranking", y = "Model 12 - Ranking", 
-       color = "Genotypes",caption = paste("Ranking correlation =", 
-                                           round(cor(comparison$blup.base,
-                                                     comparison$blup.chosen,
-                                                     method = 'spearman'),4)))+
-  scale_x_reverse(breaks = c(1,seq(5,ngen,by=5))) + 
-  scale_y_reverse(breaks = c(1,seq(5,ngen,by=5))) +
-  gghighlight(rank.base %in% 1:7 |
-                rank.chosen %in% 1:7,
-              label_key = gen,keep_scales = F, use_direct_label = F)
-
 
 plotly::ggplotly(
   comparison %>% arrange(-blup.base) %>% mutate(rank.base = 1:ngen) %>% 
