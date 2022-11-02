@@ -370,8 +370,6 @@ modsel = data.frame(
   "ExpVar" = c('-','-','-','-',"-",expvar1,expvar2,expvar3)
 )
 
-write.csv(modsel, file = "Scripts/Outputs/MET/modsel_MET.csv",row.names = F)
-
 ### Ranking comparison (Spearman correlation)
 
 rankings = cbind(blup.m0$predicted.value,blup.m1$predicted.value,blup.m2$predicted.value,
@@ -417,25 +415,6 @@ base = blup.m0[,1:2]
 colnames(base) = c('gen','blup.base')
 chosen = blup.m4.mean
 comparison = cbind(base, blup.chosen = chosen$blup)
-
-comparison %>% arrange(-blup.base) %>% mutate(rank.base = 1:ngen) %>% 
-  arrange(-blup.chosen) %>% mutate(rank.chosen = 1:ngen) %>% 
-  ggplot(aes(x = rank.base, y = rank.chosen))+
-  geom_point(aes(color = gen))+
-  theme(axis.line = element_line(colour = 'black'), legend.position = 'right',
-        panel.background = element_blank(), text = element_text(size = 14))+
-  labs(x = "Model 1 - Ranking", y = "Model 5 - Ranking", 
-       color = "Genotypes", caption = paste("Ranking correlation =", 
-                                            round(cor(comparison$blup.base,
-                                                comparison$blup.chosen,
-                                                method = 'spearman'),4)))+
-  scale_x_reverse(breaks = c(1,seq(15,ngen,by=20))) + 
-  scale_y_reverse(breaks = c(1,seq(15,ngen,by=20))) +
-  gghighlight(rank.base %in% 1:30 |
-              rank.chosen %in% 1:30,max_highlight = 35,
-              label_key = gen,keep_scales = F, use_direct_label = F)
-
-
 
 plotly::ggplotly(
   comparison %>% arrange(-blup.base) %>% mutate(rank.base = 1:ngen) %>% 
