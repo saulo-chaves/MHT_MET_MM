@@ -1,6 +1,6 @@
-# Application of linear mixed models for multiple harvests-sites trials analyses in perennial plant breeding
+# Application of linear mixed models for multiple harvest/site trials analyses in perennial plant breeding
 
-This page's data and R scripts refer to the paper (In Review). Feel free to use it and contact me if there are any issues. 
+This page's data and R scripts refer to the paper https://doi.org/10.1007/s11295-022-01576-5. Feel free to use it and contact me if there are any issues. 
 
 This pages has two folders:
 
