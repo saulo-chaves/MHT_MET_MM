@@ -192,7 +192,7 @@ for(i in 1:nlevels(data$env)){
   PEV = mean(diag(pred_vcov$vcov))
   mvd = mean((pred_sed$sed^2)[upper.tri(pred_sed$sed^2,diag = F)])
   acc.m4[i] = sqrt(1-(PEV/Gvcov[i,i]))
-  her.m4[i] = 1-(mvd/Gvcov[i,i])
+  her.m4[i] = 1-(mvd/(2*Gvcov[i,i]))
 }
 
 acc.m4.mean = mean(acc.m4, na.rm = T)
